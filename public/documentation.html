@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie API Documentation</title>
+  </head>
+  <body>
+    <header>
+      <h1>Movie API Documentation</h1>
+    </header>
+
+    <section>
+      <p>
+        Welcome to the Movie API! This API provides access to a vast collection
+        of movies, allowing users to retrieve movie details, genres, directors'
+        information, and much more. It's designed for developers to integrate
+        movie information into their applications seamlessly.
+      </p>
+
+      <table border="1">
+        <tr>
+          <th>Request</th>
+          <th>URL</th>
+          <th>Response</th>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/movies</td>
+          <td>Returns a list of all movies</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/movies/:title</td>
+          <td>Returns a single movie by title</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/movies/genre/:genreName</td>
+          <td>Returns movies by genre</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/movies/director/:directorName</td>
+          <td>Returns information about a director</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/user</td>
+          <td>Registers a new user</td>
+        </tr>
+        <tr>
+          <td>PUT</td>
+          <td>/user/:id</td>
+          <td>Updates user information</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/users/:id/movies/:movieTitle</td>
+          <td>Adds a movie to user's favorites</td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>/user/:id/movies/:movieTitle</td>
+          <td>Removes a movie from user's favorites</td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>/user/:id</td>
+          <td>Deletes a user</td>
+        </tr>
+      </table>
+    </section>
+  </body>
+</html>
