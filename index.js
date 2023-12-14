@@ -19,7 +19,7 @@ app.use(cors());
 
 let auth = require("./auth.js")(app);
 const port = process.env.PORT || 8080;
-app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
 // MongoDB connection URL and Database Name
 
