@@ -1,3 +1,4 @@
+require("dotenv").config;
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
@@ -32,10 +33,19 @@ app.use(
   })
 );
 let auth = require("./auth.js")(app);
-const port = 8080;
+const port = process.env.port || 8080;
 app.use(express.json());
 // MongoDB connection URL and Database Name
-mongoose.connect("mongodb://localhost:27017/cfDB", {});
+mongoose.set("strictQuery", false);
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(`mongoDB Connected: ${conn.Connection.host}`);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
 
 // Middleware to log HTTP requests
 app.use(morgan("common"));
@@ -49,7 +59,6 @@ const titleCase = (string) => {
     .join(" ");
 };
 
-// Static Routes
 // Route to serve the index.html file
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"), (err) => {
@@ -332,7 +341,8 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something broke!");
 });
 
-app.listen(port, () => {
-  console.log(`Movie app listening at http://localhost:${port}`);
-  // Start the connection to the database
+connectDB().then(() => {
+  app.listen(port, () => {
+    console.log(`Listening in port ${port}`);
+  });
 });
