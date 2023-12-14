@@ -15,6 +15,7 @@ const { check, validationResult } = require("express-validator");
 // Initialize Express app
 const app = express();
 const cors = require("cors");
+app.use(cors());
 
 app.use(
   cors({
