@@ -1,4 +1,4 @@
-require("dotenv").config;
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
@@ -32,14 +32,16 @@ app.use(
   })
 );
 let auth = require("./auth.js")(app);
-const port = process.env.port || 8080;
+const port = process.env.Port || 8080;
 app.use(express.json());
+
 // MongoDB connection URL and Database Name
+
 mongoose.set("strictQuery", false);
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`mongoDB Connected: ${conn.Connection.host}`);
+    console.log(`mongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.log(error);
     process.exit(1);
