@@ -70,20 +70,16 @@ app.get("/documentation", (req, res) => {
 //---------- GET Requests ------------
 
 // Route to get all movies from the database
-app.get(
-  "/movies",
-  passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
-    try {
-      await Movies.find().then((movies) => {
-        res.status(200).json(movies);
-      });
-    } catch (e) {
-      console.error(e);
-      res.status(500).send("Error: " + e);
-    }
+app.get("/movies", async (req, res) => {
+  try {
+    await Movies.find().then((movies) => {
+      res.status(200).json(movies);
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).send("Error: " + e);
   }
-);
+});
 
 // Route to get a single movie by title
 app.get(
