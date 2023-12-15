@@ -12,6 +12,8 @@ const passport = require("passport");
 let pass = require("./passport.js");
 const { check, validationResult } = require("express-validator");
 
+const bodyParser = require("body-parser");
+
 // Initialize Express app
 const app = express();
 const cors = require("cors");
@@ -22,11 +24,15 @@ const port = process.env.PORT || 8080;
 app.use(express.static(path.join(__dirname, "public")));
 
 // MongoDB connection URL and Database Name
-
+app.use(bodyParser.json());
 mongoose.set("strictQuery", false);
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      dbName: "cfDB",
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log(`mongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.log(error);
