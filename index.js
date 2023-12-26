@@ -319,8 +319,8 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something broke!");
 });
 
-connectDB().then(() => {
-  app.listen(port, () => {
-    console.log(`Listening in port ${port}`);
-  });
+// Start the server
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
 });
