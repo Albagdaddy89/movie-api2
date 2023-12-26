@@ -4,46 +4,34 @@ const morgan = require("morgan");
 const path = require("path");
 const mongoose = require("mongoose");
 const Models = require("./models.js");
-const Movies = Models.Movie;
-const Users = Models.User;
-const { MongoClient } = require("mongodb");
-const { log } = require("console");
 const passport = require("passport");
-let pass = require("./passport.js");
+const cors = require("cors");
 const { check, validationResult } = require("express-validator");
 
-const bodyParser = require("body-parser");
+// Initialize Passport configuration
+require("./passport");
 
-// Initialize Express app
 const app = express();
-const cors = require("cors");
-app.use(cors());
 
-let auth = require("./auth.js")(app);
-const port = process.env.PORT || 8080;
-app.use(express.static(path.join(__dirname, "public")));
+const Movies = Models.Movie;
+const Users = Models.User;
 
-// MongoDB connection URL and Database Name
-app.use(bodyParser.json());
-mongoose.set("strictQuery", false);
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      dbName: "cfDB",
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log(`mongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.log(error);
-    process.exit(1);
-  }
-};
+// MongoDB connection
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log(`mongoDB Connected: ${mongoose.connection.host}`))
+  .catch((error) => console.error("MongoDB connection error:", error));
 
-// Middleware to log HTTP requests
-app.use(morgan("common"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middleware setup
+app.use(cors()); // Enable CORS for all requests
+app.use(express.json()); // For parsing application/json
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(morgan("common")); // Logging HTTP requests
+app.use(express.static(path.join(__dirname, "public"))); // Serving static files
+
 // Function to make the first letter of every word caps (title case)
 const titleCase = (string) => {
   if (!string) return string;
@@ -53,17 +41,14 @@ const titleCase = (string) => {
     .join(" ");
 };
 
-// Route to serve the index.html file
+// Routes
+
+// Serve the index.html file
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"), (err) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send("An error has occurred");
-    }
-  });
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Route to serve the documentation.html file
+// Serve the documentation.html file
 app.get("/documentation", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "documentation.html"));
 });
