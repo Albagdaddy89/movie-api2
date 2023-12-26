@@ -42,7 +42,8 @@ const connectDB = async () => {
 
 // Middleware to log HTTP requests
 app.use(morgan("common"));
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 // Function to make the first letter of every word caps (title case)
 const titleCase = (string) => {
   if (!string) return string;
