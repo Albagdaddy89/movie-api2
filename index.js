@@ -4,44 +4,33 @@ const morgan = require("morgan");
 const path = require("path");
 const mongoose = require("mongoose");
 const Models = require("./models.js");
+const passport = require("passport");
+require("./passport"); // Initialize passport
+const { check, validationResult } = require("express-validator");
+const cors = require("cors");
+const app = express();
+
 const Movies = Models.Movie;
 const Users = Models.User;
-const { MongoClient } = require("mongodb");
-const { log } = require("console");
-const passport = require("passport");
-let pass = require("./passport.js");
-const { check, validationResult } = require("express-validator");
 
-const bodyParser = require("body-parser");
+// MongoDB connection
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log(`mongoDB Connected: ${mongoose.connection.host}`))
+  .catch((error) => console.error("MongoDB connection error:", error));
 
-// Initialize Express app
-const app = express();
-const cors = require("cors");
-app.use(cors());
+// Middleware setup
+app.use(express.json()); // For parsing application/json
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(morgan("common")); // Logging HTTP requests
+app.use(express.static(path.join(__dirname, "public"))); // Serving static files
+app.use(cors()); // Enable CORS for all requests
 
+// Authentication middleware
 let auth = require("./auth.js")(app);
-const port = process.env.PORT || 8080;
-app.use(express.static(path.join(__dirname, "public")));
-
-// MongoDB connection URL and Database Name
-app.use(bodyParser.json());
-mongoose.set("strictQuery", false);
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      dbName: "cfDB",
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log(`mongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.log(error);
-    process.exit(1);
-  }
-};
-
-// Middleware to log HTTP requests
-app.use(morgan("common"));
 
 // Function to make the first letter of every word caps (title case)
 const titleCase = (string) => {
