@@ -19,7 +19,7 @@ const app = express();
 const cors = require("cors");
 app.use(cors());
 
-let auth = require("./auth.js")(app);
+const auth = require("./auth.js")(app);
 const port = process.env.PORT || 8080;
 app.use(express.static(path.join(__dirname, "public")));
 
