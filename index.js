@@ -324,6 +324,36 @@ app.delete(
     }
   }
 );
+// Delete movie from a user's list of favorites
+app.delete(
+  "/users/:Username/movies/:MovieID",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      // Find the user by username and update
+      const updatedUser = await Users.findOneAndUpdate(
+        { Username: req.params.Username },
+        { $pull: { FavoriteMovies: req.params.MovieID } }, // Remove the movie ID from FavoriteMovies array
+        { new: true } // Return the updated document
+      );
+
+      // Check if the user was found and updated
+      if (!updatedUser) {
+        return res.status(404).send("User not found");
+      }
+
+      // Respond with the updated user information
+      res.status(200).json(updatedUser);
+    } catch (err) {
+      console.error(err);
+      // Send appropriate error messages
+      if (err.kind === "ObjectId") {
+        return res.status(400).send("Invalid MovieID format");
+      }
+      res.status(500).send("Error: " + err);
+    }
+  }
+);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
