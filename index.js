@@ -82,24 +82,20 @@ app.get("/movies", async (req, res) => {
   }
 });
 // Route to get favorite Movies list
-app.get(
-  "/users/:Username/FavoriteMovies",
-  passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
-    try {
-      const { Username } = req.params;
-      const user = await Users.findOne({ Username }).populate("FavoriteMovies");
-      if (!user) {
-        res.status(404).send("User not found");
-      } else {
-        res.json(user.FavoriteMovies);
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error fetching favorite movies");
+app.get("/users/:Username/FavoriteMovies", async (req, res) => {
+  try {
+    const { Username } = req.params;
+    const user = await Users.findOne({ Username }).populate("FavoriteMovies");
+    if (!user) {
+      res.status(404).send("User not found");
+    } else {
+      res.json(user.FavoriteMovies);
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error fetching favorite movies");
   }
-);
+});
 
 // Route to get a single movie by title
 app.get(
