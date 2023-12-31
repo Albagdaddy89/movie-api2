@@ -11,6 +11,8 @@ const { log } = require("console");
 const passport = require("passport");
 let pass = require("./passport.js");
 const { check, validationResult } = require("express-validator");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 const bodyParser = require("body-parser");
 
@@ -286,23 +288,30 @@ app.put(
   "/users/:Username",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    // CONDITION TO CHECK ADDED HERE
+    // Check if the authenticated user is the same as the user being updated
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission denied");
     }
-    // CONDITION ENDS
+
+    // Hash the new password if it's provided
+    let hashedPassword;
+    if (req.body.Password) {
+      hashedPassword = await bcrypt.hash(req.body.Password, saltRounds);
+    }
+
+    // Update the user document
     await Users.findOneAndUpdate(
       { Username: req.params.Username },
       {
         $set: {
           Username: req.body.Username,
-          Password: req.body.Password,
+          Password: hashedPassword || req.user.Password, // Use the hashed password, or the existing one if not changing
           Email: req.body.Email,
           Birthday: req.body.Birthday,
         },
       },
-      { new: true }
-    ) // This line makes sure that the updated document is returned
+      { new: true, runValidators: true }
+    )
       .then((updatedUser) => {
         res.json(updatedUser);
       })
