@@ -217,7 +217,6 @@ app.post(
     check("Email", "Email does not appear to be valid").isEmail(),
   ],
   async (req, res) => {
-    // check the validation object for errors
     let errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -225,41 +224,28 @@ app.post(
     }
 
     let hashedPassword = Users.hashPassword(req.body.Password);
-    await Users.findOne({ Username: req.body.Username })
-      .then((user) => {
-        if (user) {
-          // User already exists
-          return res.status(400).send(req.body.Username + " already exists");
-        } else {
-          Users.create({
-            Username: req.body.Username,
-            Password: hashedPassword,
-            Email: req.body.Email,
-            Birthday: req.body.Birthday,
-          })
-            .then((newUser) => {
-              // Generate a token
-              const token = jwt.sign(
-                { Username: newUser.Username },
-                "YourSecretKey", // Replace with your secret key
-                { expiresIn: "24h" } // Token expiration
-              );
 
-              // Send the new user data and token
-              res.status(201).json({ user: newUser, token });
-            })
-            .catch((error) => {
-              console.error(error);
-              res.status(500).send("Error: " + error);
-            });
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        res.status(500).send("Error: " + error);
+    try {
+      const existingUser = await Users.findOne({ Username: req.body.Username });
+      if (existingUser) {
+        return res.status(400).send(req.body.Username + " already exists");
+      }
+
+      const newUser = await Users.create({
+        Username: req.body.Username,
+        Password: hashedPassword,
+        Email: req.body.Email,
+        Birthday: req.body.Birthday,
       });
+
+      res.status(201).json({ user: newUser });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error: " + error);
+    }
   }
 );
+
 // Add a movie to a user's list of favorites
 app.post(
   "/users/:Username/movies/:MovieID",
