@@ -225,10 +225,10 @@ app.post(
     }
 
     let hashedPassword = Users.hashPassword(req.body.Password);
-    await Users.findOne({ Username: req.body.Username }) // Search to see if a user with the requested username already exists
+    await Users.findOne({ Username: req.body.Username })
       .then((user) => {
         if (user) {
-          //If the user is found, send a response that it already exists
+          // User already exists
           return res.status(400).send(req.body.Username + " already exists");
         } else {
           Users.create({
@@ -237,8 +237,16 @@ app.post(
             Email: req.body.Email,
             Birthday: req.body.Birthday,
           })
-            .then((user) => {
-              res.status(201).json(user);
+            .then((newUser) => {
+              // Generate a token
+              const token = jwt.sign(
+                { Username: newUser.Username },
+                "YourSecretKey", // Replace with your secret key
+                { expiresIn: "24h" } // Token expiration
+              );
+
+              // Send the new user data and token
+              res.status(201).json({ user: newUser, token });
             })
             .catch((error) => {
               console.error(error);
