@@ -258,18 +258,27 @@ app.post(
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     try {
-      // Find user and update
+      // Find the user first
+      const user = await Users.findOne({ Username: req.params.Username });
+
+      // Check if the user exists
+      if (!user) {
+        return res.status(404).send("User not found");
+      }
+
+      // Check if the movie is already in the user's favorites
+      if (user.FavoriteMovies.includes(req.params.MovieID)) {
+        return res.status(400).send("Movie is already in favorites");
+      }
+
+      // Add the movie to favorites if not already present
       const updatedUser = await Users.findOneAndUpdate(
         { Username: req.params.Username },
         { $push: { FavoriteMovies: req.params.MovieID } },
         { new: true, runValidators: true }
       );
 
-      // Check if the user was found and updated
-      if (!updatedUser) {
-        return res.status(404).send("User not found");
-      }
-
+      // Return the updated user
       res.json(updatedUser);
     } catch (err) {
       console.error(err);
